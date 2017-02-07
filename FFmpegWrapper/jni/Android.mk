@@ -51,9 +51,10 @@ include $(PREBUILT_SHARED_LIBRARY)
 include $(CLEAR_VARS)
 
 LOCAL_LDLIBS += -llog -lz
-LOCAL_SHARED_LIBRARIES := libavformat libavcodec libswscale libavutil
+LOCAL_SHARED_LIBRARIES := libavformat libavcodec libswscale libavutil libavfilter libswresample
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/include
 LOCAL_SRC_FILES := FFmpegWrapper.c
+LOCAL_SRC_FILES += CutSegments.c
 ifeq ($(TARGET_ARCH),x86)
     LOCAL_CFLAGS   := $(COMMON_FLAGS_LIST)
 else
