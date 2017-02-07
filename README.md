@@ -14,3 +14,5 @@ Before you get started, build FFmpeg for Android and generate a set of shared li
 
 should update the code：
 packet->pts = (int64_t) jPts;
+
+add function for cut video file to several ts files (hls)
