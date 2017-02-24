@@ -29,6 +29,7 @@
 const char *outputPath;
 const char *outputFormatName = "hls";
 int hlsSegmentDurationSec = 10;
+int hlsSegmentListSize = 8;
 int audioStreamIndex = -1;
 int videoStreamIndex = -1;
 
@@ -299,9 +300,10 @@ int writeFileTrailer(AVFormatContext *avfc){
  * Prepares an AVFormatContext for output.
  * Currently, the output format and codecs are hardcoded in this file.
  */
-void Java_net_openwatch_ffmpegwrapper_FFmpegWrapper_prepareAVFormatContext(JNIEnv *env, jobject obj, jstring jOutputPath){
+void Java_net_openwatch_ffmpegwrapper_FFmpegWrapper_prepareAVFormatContext(JNIEnv *env, jobject obj, jint jSegmentStartIndex, jstring jOutputPath){
     init();
 
+	int segmentStartIndex = (int)jSegmentStartIndex;
     // Create AVRational that expects timestamps in microseconds
     videoSourceTimeBase = av_malloc(sizeof(AVRational));
     videoSourceTimeBase->num = 1;
@@ -329,6 +331,8 @@ void Java_net_openwatch_ffmpegwrapper_FFmpegWrapper_prepareAVFormatContext(JNIEn
     addVideoStream(outputFormatContext);
     addAudioStream(outputFormatContext);
     av_opt_set_int(outputFormatContext->priv_data, "hls_time", hlsSegmentDurationSec, 0);
+    av_opt_set_int(outputFormatContext->priv_data, "hls_list_size", hlsSegmentListSize, 0);
+    av_opt_set_int(outputFormatContext->priv_data, "start_number", segmentStartIndex, 0);
 
     int result = openFileForWriting(outputFormatContext, outputPath);
     if(result < 0){
@@ -354,6 +358,7 @@ void Java_net_openwatch_ffmpegwrapper_FFmpegWrapper_setAVOptions(JNIEnv *env, jo
 	jfieldID jNumAudioChannelsId = (*env)->GetFieldID(env, ClassAVOptions, "numAudioChannels", "I");
 
 	jfieldID jHlsSegmentDurationSec = (*env)->GetFieldID(env, ClassAVOptions, "hlsSegmentDurationSec", "I");
+	jfieldID jHlsSegmentListSize = (*env)->GetFieldID(env, ClassAVOptions, "hlsM3u8ListSize", "I");
 
 	// 3: Get the Java object field values with the field ids!
 	VIDEO_HEIGHT = (*env)->GetIntField(env, jOpts, jVideoHeightId);
@@ -363,6 +368,7 @@ void Java_net_openwatch_ffmpegwrapper_FFmpegWrapper_setAVOptions(JNIEnv *env, jo
 	AUDIO_CHANNELS = (*env)->GetIntField(env, jOpts, jNumAudioChannelsId);
 
 	hlsSegmentDurationSec = (*env)->GetIntField(env, jOpts, jHlsSegmentDurationSec);
+	hlsSegmentListSize = (*env)->GetIntField(env, jOpts, jHlsSegmentListSize);
 
 	// that's how easy love can be!
 }
