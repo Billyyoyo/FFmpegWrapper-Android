@@ -4,6 +4,8 @@
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
 #include "libavutil/log.h"
+#include "libavutil/opt.h"
+#include "libavutil/time.h"
 
 #ifdef ANDROID
 #include <jni.h>
@@ -35,6 +37,7 @@ void custom_log(void *ptr, int level, const char* fmt, va_list vl){
 
 JNIEXPORT jint JNICALL Java_net_openwatch_ffmpegwrapper_SegmentWrapper_nativeSetDuration (JNIEnv *env, jobject obj, jint duration_jint){
 	duration=(int)duration_jint;
+	return 0;
 }
 
 void Java_postProgress(JNIEnv *env, int total_size){
@@ -146,9 +149,7 @@ JNIEXPORT jint JNICALL Java_net_openwatch_ffmpegwrapper_SegmentWrapper_nativeCut
 		ret = av_read_frame(ifmt_ctx, &pkt);
 		if (ret < 0)
 			break;
-		if(&pkt!=NULL){
-			total_size = total_size + pkt.size;
-		}
+		total_size = total_size + pkt.size;
 		//FIX£ºNo PTS (Example: Raw H.264)
 		//Simple Write PTS
 		if(pkt.pts==AV_NOPTS_VALUE){
