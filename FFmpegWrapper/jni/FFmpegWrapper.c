@@ -417,6 +417,7 @@ void Java_net_openwatch_ffmpegwrapper_FFmpegWrapper_writeAVPacketFromEncodedData
     packet->pts = (int64_t) jPts;
 
 	packet->pts = av_rescale_q(packet->pts, *videoSourceTimeBase, (outputFormatContext->streams[packet->stream_index]->time_base));
+	packet->dts = packet->pts;
 
 	/* Use this to break on specific frame */
 	if(videoFrameCount == 3){
